@@ -1,34 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 
-# ✅ Человек 3 — Заказы (OrderCreate) + Админка
-# Функционал:
-
-# Модель Order + OrderItem
-
-# Order: user, created_at, total_sum
-
-# OrderItem: product, qty, price
-
-# Создание заказа (CBV: OrderCreateView)
-
-# берём товары из корзины
-
-# создаём OrderItems
-
-# очищаем корзину
-
-# OrderDetailView
-
-# пользователь видит свой заказ (без статусов)
-
-# Cart + CartItem
-
-# добавление товара
-
-# удаление
-
-# изменение количества
 from django.views import View
 from .models import Order, OrderItem, Cart, CartItem
 
@@ -73,4 +45,25 @@ class RemoveFromCartView(View):
         cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
         cart_item.delete()
         return redirect('cart_detail')
+    
+class UpdateCartItemView(View):
+    def post(self, request, product_id):
+        qty = int(request.POST.get('qty', 1))
+        cart = Cart.objects.get(user=request.user)
+        cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
+        cart_item.qty = qty
+        cart_item.save()
+        return redirect('cart_detail')
+    
+class CartDetailView(View):
+    def get(self, request):
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        return render(request, 'cart_detail.html', {'cart': cart})
+    def __str__(self):
+        return f"{self.qty} x {self.product.name}"
+    
+        return f"{self.qty} x {self.product.name}"
+
+
+
 

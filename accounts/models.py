@@ -1,33 +1,5 @@
 from django.db import models
 
-# Cart + CartItem
-
-# добавление товара
-
-# удаление
-
-# изменение количества
-
-# ✅ Человек 3 — Заказы (OrderCreate) + Админка
-# Функционал:
-
-# Модель Order + OrderItem
-
-# Order: user, created_at, total_sum
-
-# OrderItem: product, qty, price
-
-# Создание заказа (CBV: OrderCreateView)
-
-# берём товары из корзины
-
-# создаём OrderItems
-
-# очищаем корзину
-
-# OrderDetailView
-
-# пользователь видит свой заказ (без статусов)
 
 class Order(models.Model):
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
