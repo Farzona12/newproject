@@ -1,69 +1,102 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
 
-from django.views import View
-from .models import Order, OrderItem, Cart, CartItem
-
-class OrderCreateView(View):
-    def post(self, request):
-        cart = Cart.objects.get(user=request.user)
-        order = Order.objects.create(user=request.user, total_sum=0)
-        total_sum = 0
-
-        for item in cart.items.all():
-            OrderItem.objects.create(
-                order=order,
-                product=item.product,
-                qty=item.qty,
-                price=item.product.price
-            )
-            total_sum += item.qty * item.product.price
-
-        order.total_sum = total_sum
-        order.save()
-
-        cart.items.all().delete() 
-
-        return redirect('order_detail', pk=order.pk)
-
-class OrderDetailView(View):
-    def get(self, request, pk):
-        order = Order.objects.get(pk=pk, user=request.user)
-        return render(request, 'order_detail.html', {'order': order})
-    
-class AddToCartView(View):
-    def post(self, request, product_id):
-        cart, created = Cart.objects.get_or_create(user=request.user)
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, product_id=product_id)
-        cart_item.qty += 1
-        cart_item.save()
-        return redirect('cart_detail')
-    
-class RemoveFromCartView(View):
-    def post(self, request, product_id):
-        cart = Cart.objects.get(user=request.user)
-        cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
-        cart_item.delete()
-        return redirect('cart_detail')
-    
-class UpdateCartItemView(View):
-    def post(self, request, product_id):
-        qty = int(request.POST.get('qty', 1))
-        cart = Cart.objects.get(user=request.user)
-        cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
-        cart_item.qty = qty
-        cart_item.save()
-        return redirect('cart_detail')
-    
-class CartDetailView(View):
-    def get(self, request):
-        cart, created = Cart.objects.get_or_create(user=request.user)
-        return render(request, 'cart_detail.html', {'cart': cart})
-    def __str__(self):
-        return f"{self.qty} x {self.product.name}"
-    
-        return f"{self.qty} x {self.product.name}"
+from django.shortcuts import render,redirect,HttpResponse
+from django.contrib.auth import login,logout,authenticate 
+from .models import CustomUser
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 
 
+def register_view(request):
+    if request.method == 'GET':
+        return render(request, 'register.html')
 
+    elif request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        confirm = request.POST.get('confirm')
+
+        if not username or not email or not password:
+            return render(request, 'register.html', {
+                'username': username,
+                'email': email,
+                'error': 'Заполни все поля!'
+            })
+
+        if password != confirm:
+            return render(request, 'register.html', {
+                'username': username,
+                'email': email,
+                'error': 'Пароли не совпадают!'
+            })
+
+        CustomUser.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        return redirect('login')
+
+
+
+ 
+def login_view(request):
+    if request.method == 'GET':
+        return render(request, 'login.html')
+
+    elif request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        if not email or not password:
+            return render(request, 'login.html', {
+                'email': email,
+                'error': 'Заполни все поля!'
+            })
+
+        user = authenticate(email=email, password=password)
+
+        if user:
+            if not user.email_verified:
+                return render(request, 'login.html', {
+                    'email': email,
+                    'error': 'Подтверди email прежде чем войти!'
+                })
+
+            login(request, user)
+            return redirect('/')
+
+        return render(request, 'login.html', {
+            'email': email,
+            'error': 'Неверные данные!'
+        })
+
+        
+
+def logout_view(request):
+    try:
+        logout(request)
+        return redirect("login")
+    except Exception as er:
+        return HttpResponse(str(er))
+
+
+
+
+User = get_user_model()
+token_generator = PasswordResetTokenGenerator()
+
+def confirm_email(request, user_id, token):
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return HttpResponse("User not found")
+
+    if token_generator.check_token(user, token):
+        user.email_verified = True
+        user.save()
+        return HttpResponse("Your email has been confirmed!")
+
+    return HttpResponse("Invalid or expired confirmation link")

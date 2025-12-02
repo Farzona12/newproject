@@ -1,39 +1,16 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from .managers import CustomUserManager
 
 
-class Order(models.Model):
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    total_sum = models.DecimalField(max_digits=10, decimal_places=2)
+class CustomUser(AbstractUser):
+    username = models.CharField(max_length=100,null=True)
+    email = models.CharField(max_length=200,unique=True)
 
-    def __str__(self):
-        return f"Order {self.id} by {self.user.username}"
-    
-    
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
-    product = models.ForeignKey('products.Product', on_delete=models.CASCADE)
-    qty = models.PositiveIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    email_verified = models.BooleanField(default=False)
 
-    def __str__(self):
-        return f"{self.qty} x {self.product.name} @ {self.price}"
-    
-class Cart(models.Model):
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    objects = CustomUserManager()
 
-    def __str__(self):
-        return f"Cart of {self.user.username}"
-    
-class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
-    product = models.ForeignKey('products.Product', on_delete=models.CASCADE)
-    qty = models.PositiveIntegerField()
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
 
-    def __str__(self):
-        return f"{self.qty} x {self.product.name}"
-    
-    def total_price(self):
-        return self.qty * self.product.price
-    
-        
