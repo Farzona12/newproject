@@ -6,6 +6,21 @@
     <title>Market list</title>
 </head>
 <body>
+
+    {% for i in markets %}
+        <a href="{% url 'market_detail' i.id %}">
+        <div class="market">
+            {% if i.photo %}
+            <img src="{{ i.photo.url }}" alt="Place photo">
+            {% endif %}
+
+            <p class="email">Добавил: {{ i.user.email }}</p>
+
+            <h2>{{ i.name }}</h2>
+            <p>{{ i.description }}</p>
+        </div>
+        </a>
+    {% endfor %}
     
 </body>
 </html>

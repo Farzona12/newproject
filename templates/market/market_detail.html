@@ -13,18 +13,18 @@
         <img src="{{ market.image.url }}" alt="Place image">
         {% endif %}
 
-        <p class="email">Добавил: {{ market.user.email }}</p>
+        <p>Добавил: {{ market.user.email }}</p>
 
         <div class="info-block">
             <h2>{{ market.name }}</h2>
-            <p><span class="label">Description:</span> {{ market.description }}</p>
-            <p><span class="label">Адрес:</span> {{ market.address }}</p>
+            <p><span>Description:</span> {{ market.description }}</p>
+            <p><span>Адрес:</span> {{ market.address }}</p>
 
-            <p><span class="label">Добавлено:</span> {{ market.created_at }}</p>
+            <p><span>Добавлено:</span> {{ market.created_at }}</p>
 
-            <div class="btns" style="margin-top: 30px;">
-                <a href="{% url 'update_place' market.pk %}"><button>Edit</button></a>
-                <a href="{% url 'place_delete_confirm' market.pk %}"><button>Delete</button></a>
+            <div>
+                <a href="{% url 'update_market' market.pk %}"><button>Edit</button></a>
+                <a href="{% url 'market_delete_confirm' market.pk %}"><button>Delete</button></a>
             </div>
         </div>
 

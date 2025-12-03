@@ -66,7 +66,7 @@ def login_view(request):
                 })
 
             login(request, user)
-            return redirect('/')
+            return redirect('/market/market_list/')
 
         return render(request, 'login.html', {
             'email': email,
