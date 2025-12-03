@@ -1,8 +1,6 @@
-<<<<<<< HEAD
+
 from django.shortcuts import render
 
-# Create your views here.
-=======
 
 from django.shortcuts import render,redirect,HttpResponse
 from django.contrib.auth import login,logout,authenticate 
@@ -105,4 +103,4 @@ def confirm_email(request, user_id, token):
         return HttpResponse("Your email has been confirmed!")
 
     return HttpResponse("Invalid or expired confirmation link")
->>>>>>> be7f8673523485291320f792f7c7aaa1d799cf9c
+
