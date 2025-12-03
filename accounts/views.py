@@ -1,4 +1,7 @@
 
+from django.shortcuts import render
+
+
 from django.shortcuts import render,redirect,HttpResponse
 from django.contrib.auth import login,logout,authenticate 
 from .models import CustomUser
@@ -100,3 +103,4 @@ def confirm_email(request, user_id, token):
         return HttpResponse("Your email has been confirmed!")
 
     return HttpResponse("Invalid or expired confirmation link")
+
