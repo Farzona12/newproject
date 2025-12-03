@@ -1,6 +1,7 @@
 from django.db import models
 
 class Market(models.Model):
+    user = models.ForeignKey()
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True)
     address = models.CharField(max_length=200)
