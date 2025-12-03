@@ -1,7 +1,8 @@
 from django.db import models
+from accounts.models import *
 
 class Market(models.Model):
-    user = models.ForeignKey()
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True)
     address = models.CharField(max_length=200)
